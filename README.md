@@ -37,7 +37,7 @@ Load the `.env` file **before** importing this library so the keys are available
 
 ```python
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=True)  # Load .env file
 
 from my_llm import Provider, Model, get_client
 
