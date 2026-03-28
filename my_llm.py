@@ -186,3 +186,28 @@ def list_ollama_models() -> List[str]:
         if parts:
             model_list.append(parts[0])
     return model_list
+
+
+# ---------------------------------------------------------------------------
+# Adding Your Own Providers, Models, and Keys
+# ---------------------------------------------------------------------------
+#
+# 1. Add a new provider to the Provider enum:
+#
+#       MY_PROVIDER = "my_provider"
+#
+# 2. Add models to the Model enum:
+#
+#       MY_PROVIDER_MODEL_A = "model-a-id"
+#       MY_PROVIDER_MODEL_B = "model-b-id"
+#
+# 3. Add the base URL and API key to _BASE_URLS and _API_KEYS:
+#
+#       _BASE_URLS[Provider.MY_PROVIDER] = "https://api.example.com/v1"
+#       _API_KEYS[Provider.MY_PROVIDER] = os.getenv("MY_PROVIDER_API_KEY")
+#
+# 4. Add the key to your .env file:
+#
+#       MY_PROVIDER_API_KEY=...
+#
+# get_client(Provider.MY_PROVIDER) will then work like any built-in provider.
