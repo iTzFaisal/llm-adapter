@@ -35,6 +35,8 @@ Load the `.env` file **before** importing this library so the keys are available
 
 ## Usage
 
+### Standard OpenAI client
+
 ```python
 from dotenv import load_dotenv
 load_dotenv(override=True)  # Load .env file
@@ -49,9 +51,27 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-`get_client` validates the API key before returning the client and will raise `EnvironmentError` if it's missing.
+### OpenAI Agents SDK
 
-List locally available Ollama models:
+Use `get_agent_model` to get a model instance compatible with the OpenAI Agents SDK:
+
+```python
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
+from my_llm import Provider, Model, get_agent_model
+from agents import Agent
+
+agent = Agent(
+    name="My Agent",
+    instructions="You are a helpful assistant.",
+    model=get_agent_model(Provider.OPENAI, Model.GPT_4O_MINI),
+)
+```
+
+Both `get_client` and `get_agent_model` validate the API key and will raise `EnvironmentError` if it's missing.
+
+### List Ollama models
 
 ```python
 from my_llm import list_ollama_models
@@ -106,4 +126,4 @@ _API_KEYS = {
 MY_PROVIDER_API_KEY=...
 ```
 
-That's it — `get_client(Provider.MY_PROVIDER)` will now work like any built-in provider, including key validation.
+That's it — `get_client(Provider.MY_PROVIDER)` and `get_agent_model(Provider.MY_PROVIDER, Model.MY_PROVIDER_MODEL_A)` will now work like any built-in provider, including key validation.

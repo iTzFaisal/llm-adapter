@@ -6,12 +6,23 @@ Each provider is configured with a base URL and an API key (sourced from
 environment variables at import time).
 
 Usage:
-    from my_llm import Provider, Model, get_client
+    from my_llm import Provider, Model, get_client, get_agent_model
 
+    # Standard OpenAI client
     client = get_client(Provider.OPENAI)
     response = client.chat.completions.create(
         model=Model.GPT_4O_MINI.value,
-        messages=[{"role": "user", "content": "Hello!"}],
+        messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Hello!"},
+        ],
+    )
+
+    # Model for OpenAI Agents SDK
+    agent = Agent(
+        name="My Agent",
+        instructions="you are a helpful assistant",
+        model=get_agent_model(Provider.OPENAI, Model.GPT_4O_MINI)
     )
 """
 
@@ -20,7 +31,8 @@ import subprocess
 from enum import Enum
 from typing import List, Optional
 
-from openai import OpenAI
+from agents import OpenAIChatCompletionsModel
+from openai import AsyncOpenAI, OpenAI
 
 # ---------------------------------------------------------------------------
 # Provider & Model enums
@@ -130,6 +142,27 @@ def get_client(provider: Provider) -> OpenAI:
     )
 
 
+def get_agent_model(provider: Provider, model: Model) -> OpenAIChatCompletionsModel:
+    """Return an OpenAIChatCompletionsModel for use with OpenAI Agents SDK.
+
+    Args:
+        provider: The LLM provider to connect to.
+        model: The model to use.
+
+    Returns:
+        An ``OpenAIChatCompletionsModel`` ready to pass to an ``Agent``.
+
+    Raises:
+        EnvironmentError: If the API key for the provider is missing.
+    """
+    validate_keys([provider])
+    client = AsyncOpenAI(
+        base_url=_BASE_URLS[provider],
+        api_key=_API_KEYS[provider],
+    )
+    return OpenAIChatCompletionsModel(model=model.value, openai_client=client)
+
+
 def validate_keys(providers: Optional[List[Provider]] = None) -> bool:
     """Check that API keys are present for the specified providers.
 
@@ -210,4 +243,3 @@ def list_ollama_models() -> List[str]:
 #
 #       MY_PROVIDER_API_KEY=...
 #
-# get_client(Provider.MY_PROVIDER) will then work like any built-in provider.
