@@ -11,7 +11,7 @@ Usage:
     # Standard OpenAI client
     client = get_client(Provider.OPENAI)
     response = client.chat.completions.create(
-        model=Model.GPT_4O_MINI.value,
+        model=Model.GPT_4O_MINI.value, # Note: .value to get the string identifier
         messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Hello!"},
@@ -74,6 +74,8 @@ class Model(Enum):
     NVIDIA_NIM_QWEN3_5_397B_A17B = "qwen/qwen3.5-397b-a17b"
     NVIDIA_NIM_DEEPSEEK_3_2 = "deepseek-ai/deepseek-v3.2"
     NVIDIA_NIM_GPT_OSS_120B = "openai/gpt-oss-120b"
+    NVIDIA_NIM_NEMOTRON_3_SUPER_120B = "nvidia/nemotron-3-super-120b-a12b"
+    NVIDIA_NIM_NEMOTRON_3_NANO_30B = "nvidia/nemotron-3-nano-30b-a3b"
 
     # OpenCode
     OPENCODE_GLM_5 = "glm-5"
@@ -90,6 +92,7 @@ class Model(Enum):
     # Ollama (local)
     OLLAMA_QWEN3 = "qwen3-4b-instruct-2507-i1-q4_k_m"
     OLLAMA_QWEN3_HERETIC = "qwen3-4b-instruct-2507-heretic-av2-i1-q4_k_m"
+    OLLAMA_QWEN3_THINKING = "qwen3-4b-thinking-2507-i1-q4_k_m"
 
 
 # ---------------------------------------------------------------------------
@@ -224,22 +227,36 @@ def list_ollama_models() -> List[str]:
 # ---------------------------------------------------------------------------
 # Adding Your Own Providers, Models, and Keys
 # ---------------------------------------------------------------------------
-#
-# 1. Add a new provider to the Provider enum:
-#
-#       MY_PROVIDER = "my_provider"
-#
-# 2. Add models to the Model enum:
-#
-#       MY_PROVIDER_MODEL_A = "model-a-id"
-#       MY_PROVIDER_MODEL_B = "model-b-id"
-#
-# 3. Add the base URL and API key to _BASE_URLS and _API_KEYS:
-#
-#       _BASE_URLS[Provider.MY_PROVIDER] = "https://api.example.com/v1"
-#       _API_KEYS[Provider.MY_PROVIDER] = os.getenv("MY_PROVIDER_API_KEY")
-#
-# 4. Add the key to your .env file:
-#
-#       MY_PROVIDER_API_KEY=...
-#
+# ### 1. Add a new provider
+
+# Add an entry to the `Provider` enum:
+# class Provider(Enum):
+#     # ...existing providers...
+#     MY_PROVIDER = "my_provider"
+
+
+# ### 2. Add models for the provider
+
+# Add entries to the `Model` enum:
+# class Model(Enum):
+#     # ...existing models...
+#     MY_PROVIDER_MODEL_A = "model-a-id"
+#     MY_PROVIDER_MODEL_B = "model-b-id"
+
+# ### 3. Configure the base URL and API key
+
+# Add entries to `_BASE_URLS` and `_API_KEYS`:
+# _BASE_URLS = {
+#     # ...existing entries...
+#     Provider.MY_PROVIDER: "https://api.example.com/v1",
+# }
+
+# _API_KEYS = {
+#     # ...existing entries...
+#     Provider.MY_PROVIDER: os.getenv("MY_PROVIDER_API_KEY"),
+# }
+
+# ### 4. Add the key to your `.env` file
+
+# MY_PROVIDER_API_KEY=...
+
